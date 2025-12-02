@@ -3,7 +3,6 @@ import mediapipe as mp
 import time
 import os
 import subprocess
-
 from PIL import Image
 import numpy as np
 
@@ -56,41 +55,6 @@ def is_thumb_up(hand_landmarks):
     )
 
     return thumb_extended and fingers_folded
-
-def overlay_png(bg, fg, x, y):
-    """
-    Overlay fg (with or without alpha) onto bg at position (x, y).
-    - bg: BGR frame (OpenCV image)
-    - fg: BGR or BGRA emote image
-    """
-    bh, bw, _ = bg.shape
-    fh, fw = fg.shape[:2]
-
-    if x >= bw or y >= bh:
-        return bg
-
-    # Clip if emote goes off the edge
-    if x + fw > bw:
-        fw = bw - x
-        fg = fg[:, :fw]
-    if y + fh > bh:
-        fh = bh - y
-        fg = fg[:fh]
-
-    if fg.shape[2] == 4:
-        # Has alpha channel
-        fg_rgb = fg[:, :, :3]
-        alpha = fg[:, :, 3] / 255.0
-        alpha = alpha[..., None]
-
-        bg_roi = bg[y:y+fh, x:x+fw]
-        blended = (alpha * fg_rgb + (1 - alpha) * bg_roi).astype("uint8")
-        bg[y:y+fh, x:x+fw] = blended
-    else:
-        # No alpha, just paste
-        bg[y:y+fh, x:x+fw] = fg
-
-    return bg
 
 
 def main():
